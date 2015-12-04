@@ -24,22 +24,23 @@ import java.io.InputStreamReader;
 
 /**
  * @author SunYiJun
+ * @since 0.0.1
  */
 public abstract class Executor {
 
-    public ExeResult execute() throws IOException {
+    public <P extends Parameters> ExeResult execute(Command<P> command, P params) throws IOException {
         OS osType = FileSystemUtils.checkOSType();
 
         Process process;
         switch (osType) {
             case WINDOWS:
-                process = executeWindows();
+                process = executeWindows(command, params);
                 break;
             case LINUX:
-                process = executeLinux();
+                process = executeLinux(command, params);
                 break;
             case OTHERS:
-                process = executeOthers();
+                process = executeOthers(command, params);
                 break;
             default:
                 throw new UnsupportedOperationException("Not support " + osType + " OS yet!");
@@ -74,10 +75,10 @@ public abstract class Executor {
         return ExeResult.success();
     }
 
-    protected abstract Process executeWindows();
+    protected abstract <P extends Parameters> Process executeWindows(Command<P> command, P params) throws IOException;
 
-    protected abstract Process executeLinux();
+    protected abstract <P extends Parameters> Process executeLinux(Command<P> command, P params) throws IOException;
 
-    protected abstract Process executeOthers();
+    protected abstract <P extends Parameters> Process executeOthers(Command<P> command, P params) throws IOException;
 
 }
