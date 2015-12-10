@@ -23,13 +23,20 @@ public class ExeResult {
 
     public boolean success;
 
-    public String consoleMsg;
+    private StringBuilder consoleMsg = new StringBuilder();
 
-    public String errorMsg;
+    private StringBuilder errorMsg = new StringBuilder();
 
     public static ExeResult success() {
         ExeResult result = new ExeResult();
         result.success = true;
+        return result;
+    }
+
+    public static ExeResult success(StringBuilder consoleMsg) {
+        ExeResult result = new ExeResult();
+        result.success = true;
+        result.consoleMsg = consoleMsg;
         return result;
     }
 
@@ -39,9 +46,17 @@ public class ExeResult {
         return result;
     }
 
-    public static ExeResult errorWithMsg(String errorMsg) {
+    public static ExeResult errorWithMsg(StringBuilder errorMsg) {
         ExeResult result = new ExeResult();
         result.success = false;
+        result.errorMsg = errorMsg;
+        return result;
+    }
+
+    public static ExeResult errorWithMsg(StringBuilder consoleMsg, StringBuilder errorMsg) {
+        ExeResult result = new ExeResult();
+        result.success = false;
+        result.consoleMsg = consoleMsg;
         result.errorMsg = errorMsg;
         return result;
     }
@@ -50,11 +65,11 @@ public class ExeResult {
         return success;
     }
 
-    public String getConsoleMsg() {
+    public StringBuilder getConsoleMsg() {
         return consoleMsg;
     }
 
-    public String getErrorMsg() {
+    public StringBuilder getErrorMsg() {
         return errorMsg;
     }
 

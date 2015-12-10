@@ -16,10 +16,17 @@
 package net.sunyijun.os.cmd;
 
 /**
- * Only a type define. Have no function now.
+ * Callback for {@link Executor#execute(Command, Parameters, IConsoleLineCallback)}.<br/>
+ * When console print one new normal info line, will call {@link #processNormalMsg(String)}.
+ * if console print one new error info line, will call {@link #processErrorMsg(String)}.
  *
  * @author SunYiJun
  * @since 0.0.1
  */
-public interface Parameters {
+public interface IConsoleLineCallback {
+
+    void processNormalMsg(String newLine);
+
+    void processErrorMsg(String newLine);
+
 }

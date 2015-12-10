@@ -21,18 +21,49 @@ package net.sunyijun.os.cmd;
  */
 public class PingSimple implements Command<PingSimple.Params> {
 
-    public class Params extends Parameters {
+    public static class Params implements Parameters {
+        public Params(String ip) {
+            this.ip = ip;
+        }
+
+        public Params(String ip, Integer sendCount) {
+            this.ip = ip;
+            this.sendCount = sendCount;
+        }
+
+        public Params(String ip, Integer sendCount, Integer timeout) {
+            this.ip = ip;
+            this.sendCount = sendCount;
+            this.timeout = timeout;
+        }
+
         public String ip;
-        public int sendCount;
-        public int timeout;
+        public Integer sendCount;
+        public Integer timeout;
     }
 
     public String getWindowsCommand(Params params) {
-        return "ping -n " + params.sendCount + " -w " + params.timeout + " " + params.ip;
+        StringBuilder builder = new StringBuilder("ping");
+        if (params.sendCount != null) {
+            builder.append(" -n ").append(params.sendCount);
+        }
+        if (params.timeout != null) {
+            builder.append(" -w ").append(params.timeout);
+        }
+        builder.append(" ").append(params.ip);
+        return builder.toString();
     }
 
     public String getLinuxCommand(Params params) {
-        return "ping -c " + params.sendCount + " -w " + params.timeout + " " + params.ip;
+        StringBuilder builder = new StringBuilder("ping");
+        if (params.sendCount != null) {
+            builder.append(" -c ").append(params.sendCount);
+        }
+        if (params.timeout != null) {
+            builder.append(" -w ").append(params.timeout);
+        }
+        builder.append(" ").append(params.ip);
+        return builder.toString();
     }
 
     public String getOthersCommand(Params params) {

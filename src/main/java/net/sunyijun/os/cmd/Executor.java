@@ -28,7 +28,55 @@ import java.io.InputStreamReader;
  */
 public abstract class Executor {
 
+    private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+
+    private class ConsoleMsgCollector implements IConsoleLineCallback {
+
+        private StringBuilder normalStrBuilder = new StringBuilder();
+        private StringBuilder errStrBuilder = new StringBuilder();
+
+        public void processNormalMsg(String newLine) {
+            normalStrBuilder.append(newLine).append(LINE_SEPARATOR);
+        }
+
+        public void processErrorMsg(String newLine) {
+            errStrBuilder.append(newLine).append(LINE_SEPARATOR);
+        }
+
+        StringBuilder getNormalStrBuilder() {
+            if (normalStrBuilder.length() > LINE_SEPARATOR.length()) {
+                normalStrBuilder.delete(normalStrBuilder.lastIndexOf(LINE_SEPARATOR), normalStrBuilder.length());
+            }
+            return normalStrBuilder;
+        }
+
+        StringBuilder getErrStrBuilder() {
+            if (errStrBuilder.length() > LINE_SEPARATOR.length()) {
+                errStrBuilder.delete(errStrBuilder.lastIndexOf(LINE_SEPARATOR), errStrBuilder.length());
+            }
+            return errStrBuilder;
+        }
+
+        boolean haveErrStr() {
+            return errStrBuilder.length() > 0;
+        }
+
+    }
+
     public <P extends Parameters> ExeResult execute(Command<P> command, P params) throws IOException {
+        ConsoleMsgCollector consoleMsgCollector = new ConsoleMsgCollector();
+        execute(command, params, consoleMsgCollector);
+
+        if (consoleMsgCollector.haveErrStr()) {
+            return ExeResult
+                    .errorWithMsg(consoleMsgCollector.getNormalStrBuilder(), consoleMsgCollector.getErrStrBuilder());
+        } else {
+            return ExeResult.success(consoleMsgCollector.getNormalStrBuilder());
+        }
+    }
+
+    public <P extends Parameters> void execute(Command<P> command, P params, IConsoleLineCallback callback)
+            throws IOException {
         OS osType = FileSystemUtils.checkOSType();
 
         Process process;
@@ -53,10 +101,11 @@ public abstract class Executor {
             err = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
             while ((line = in.readLine()) != null) {
-                System.out.println(line);
+                callback.processNormalMsg(line);
             }
-            while ((line = err.readLine()) != null) {
-                System.out.println(line);
+            String errLine;
+            while ((errLine = err.readLine()) != null) {
+                callback.processErrorMsg(errLine);
             }
         } finally {
             if (in != null) {
@@ -72,7 +121,6 @@ public abstract class Executor {
                 }
             }
         }
-        return ExeResult.success();
     }
 
     protected abstract <P extends Parameters> Process executeWindows(Command<P> command, P params) throws IOException;
