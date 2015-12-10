@@ -13,7 +13,10 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package net.sunyijun.os.cmd;
+package net.sunyijun.os.cmd.impl;
+
+import net.sunyijun.os.cmd.Command;
+import net.sunyijun.os.cmd.Parameters;
 
 /**
  * @author SunYiJun
