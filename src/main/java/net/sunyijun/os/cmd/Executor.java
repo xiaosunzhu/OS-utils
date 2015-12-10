@@ -78,21 +78,7 @@ public abstract class Executor {
     public <P extends Parameters> void execute(Command<P> command, P params, IConsoleLineCallback callback)
             throws IOException {
         OS osType = FileSystemUtils.checkOSType();
-
-        Process process;
-        switch (osType) {
-            case WINDOWS:
-                process = executeWindows(command, params);
-                break;
-            case LINUX:
-                process = executeLinux(command, params);
-                break;
-            case OTHERS:
-                process = executeOthers(command, params);
-                break;
-            default:
-                throw new UnsupportedOperationException("Not support " + osType + " OS yet!");
-        }
+        Process process = execute(command, params, osType);
 
         BufferedReader in = null;
         BufferedReader err = null;
@@ -121,6 +107,78 @@ public abstract class Executor {
                 }
             }
         }
+    }
+
+    public <P extends Parameters> void execute(Command<P> command, P params,
+                                               IConsoleLineCallbackForDifferentOS callback) throws IOException {
+        OS osType = FileSystemUtils.checkOSType();
+        Process process = execute(command, params, osType);
+
+        BufferedReader in = null;
+        BufferedReader err = null;
+        try {
+            in = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            err = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+            while ((line = in.readLine()) != null) {
+                switch (osType) {
+                    case WINDOWS:
+                        callback.processNormalWindows(line);
+                        break;
+                    case LINUX:
+                        callback.processNormalLinux(line);
+                        break;
+                    case OTHERS:
+                        callback.processNormalOthers(line);
+                        break;
+                }
+            }
+            String errLine;
+            while ((errLine = err.readLine()) != null) {
+                switch (osType) {
+                    case WINDOWS:
+                        callback.processErrorWindows(errLine);
+                        break;
+                    case LINUX:
+                        callback.processErrorLinux(errLine);
+                        break;
+                    case OTHERS:
+                        callback.processErrorOthers(errLine);
+                        break;
+                }
+            }
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException ignored) {
+                }
+            }
+            if (err != null) {
+                try {
+                    err.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
+    }
+
+    private <P extends Parameters> Process execute(Command<P> command, P params, OS osType) throws IOException {
+        Process process;
+        switch (osType) {
+            case WINDOWS:
+                process = executeWindows(command, params);
+                break;
+            case LINUX:
+                process = executeLinux(command, params);
+                break;
+            case OTHERS:
+                process = executeOthers(command, params);
+                break;
+            default:
+                throw new UnsupportedOperationException("Not support " + osType + " OS yet!");
+        }
+        return process;
     }
 
     protected abstract <P extends Parameters> Process executeWindows(Command<P> command, P params) throws IOException;
