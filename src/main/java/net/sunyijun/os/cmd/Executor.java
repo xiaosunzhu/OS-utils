@@ -28,31 +28,29 @@ import java.io.InputStreamReader;
  */
 public abstract class Executor {
 
-    private static final String LINE_SEPARATOR = System.getProperty("line.separator");
-
     private class ConsoleMsgCollector implements IConsoleLineCallback {
 
         private StringBuilder normalStrBuilder = new StringBuilder();
         private StringBuilder errStrBuilder = new StringBuilder();
 
         public void processNormalMsg(String newLine) {
-            normalStrBuilder.append(newLine).append(LINE_SEPARATOR);
+            normalStrBuilder.append(newLine).append(OS.LINE_SEPARATOR);
         }
 
         public void processErrorMsg(String newLine) {
-            errStrBuilder.append(newLine).append(LINE_SEPARATOR);
+            errStrBuilder.append(newLine).append(OS.LINE_SEPARATOR);
         }
 
         StringBuilder getNormalStrBuilder() {
-            if (normalStrBuilder.length() > LINE_SEPARATOR.length()) {
-                normalStrBuilder.delete(normalStrBuilder.lastIndexOf(LINE_SEPARATOR), normalStrBuilder.length());
+            if (normalStrBuilder.length() > OS.LINE_SEPARATOR.length()) {
+                normalStrBuilder.delete(normalStrBuilder.lastIndexOf(OS.LINE_SEPARATOR), normalStrBuilder.length());
             }
             return normalStrBuilder;
         }
 
         StringBuilder getErrStrBuilder() {
-            if (errStrBuilder.length() > LINE_SEPARATOR.length()) {
-                errStrBuilder.delete(errStrBuilder.lastIndexOf(LINE_SEPARATOR), errStrBuilder.length());
+            if (errStrBuilder.length() > OS.LINE_SEPARATOR.length()) {
+                errStrBuilder.delete(errStrBuilder.lastIndexOf(OS.LINE_SEPARATOR), errStrBuilder.length());
             }
             return errStrBuilder;
         }
